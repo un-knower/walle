@@ -1,5 +1,6 @@
 package com.dashu.log.monitor.dao;
 
+import com.dashu.log.Entity.QueryHistory;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -20,6 +21,7 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ import java.util.Map;
  * @Date 2018/8/27 上午10:43
  **/
 public class EsQuery {
+    @Autowired
+    private QueryHistoryRepository queryHistoryRepository;
 
     /**
      * 关键字过滤查询
@@ -41,6 +45,19 @@ public class EsQuery {
      * @throws IOException
      */
     public  List<Map> filterSearch(String index,String field,String keyword,String timestamp) throws IOException {
+        if (index==null||index==""){
+            index="kafka";
+        }
+        if (field==null||field==""){
+            field="loglevel";
+        }
+        if (keyword==null||keyword==""){
+            keyword="ERROR";
+        }
+        if (timestamp==null||timestamp==""){
+            timestamp="2018-08-23T10:41:45.230Z";
+            queryHistoryRepository.insertQueryHistory(index,timestamp);
+        }
         RestHighLevelClient client=connect();
         final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
         SearchRequest searchRequest = new SearchRequest(index);
@@ -59,7 +76,6 @@ public class EsQuery {
         while (searchHits != null && searchHits.length > 0) {
             for (SearchHit hit : searchHits) {
                 Map<String, Object> map = hit.getSourceAsMap();
-//                System.out.println(map.get("message"));
                 mapList.add(map);
             }
             SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
