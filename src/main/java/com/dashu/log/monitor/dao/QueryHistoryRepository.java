@@ -1,6 +1,6 @@
 package com.dashu.log.monitor.dao;
 
-import com.dashu.log.Entity.QueryHistory;
+import com.dashu.log.entity.QueryHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +17,7 @@ public interface QueryHistoryRepository extends JpaRepository<QueryHistory,Long>
     @Transactional
     @Query(value = "insert into query_history(index_name,oldest_time) values (?1,?2)",nativeQuery = true)
     void insertQueryHistory(String index,String newtimestamp);
+
 
     @Query(value = "select q.oldestTime from QueryHistory q where q.indexName=?1")
     String findOldestTimestampByIndexName(String indexName);

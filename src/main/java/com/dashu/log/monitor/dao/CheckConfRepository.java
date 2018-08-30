@@ -1,6 +1,6 @@
 package com.dashu.log.monitor.dao;
 
-import com.dashu.log.Entity.CheckConf;
+import com.dashu.log.entity.CheckConf;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

@@ -1,7 +1,0 @@
-- index: kafka
-  field: loglevel
-  keyword: ERROR
-
-- index: hbase
-  field: message
-  keyword: ERROR

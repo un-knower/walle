@@ -1,6 +1,6 @@
-package com.dashu.log.monitor.dao;
+package com.dashu.log.monitor;
 
-import com.dashu.log.Entity.QueryHistory;
+import com.dashu.log.monitor.dao.QueryHistoryRepository;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -33,9 +33,8 @@ import java.util.Map;
  * @Author: xuyouchang
  * @Date 2018/8/27 上午10:43
  **/
+
 public class EsQuery {
-    @Autowired
-    private QueryHistoryRepository queryHistoryRepository;
 
     /**
      * 关键字过滤查询
@@ -54,10 +53,7 @@ public class EsQuery {
         if (keyword==null||keyword==""){
             keyword="ERROR";
         }
-        if (timestamp==null||timestamp==""){
-            timestamp="2018-08-23T10:41:45.230Z";
-            queryHistoryRepository.insertQueryHistory(index,timestamp);
-        }
+
         RestHighLevelClient client=connect();
         final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
         SearchRequest searchRequest = new SearchRequest(index);

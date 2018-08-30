@@ -1,8 +1,10 @@
 package com.dashu.log.classification.action;
 
-import com.dashu.log.Entity.ErrorLogType;
+import com.dashu.log.entity.ErrorLogType;
 import com.dashu.log.classification.dao.ErrorLogTypeRepository;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,7 +17,9 @@ import java.util.regex.Pattern;
  * @Author: xuyouchang
  * @Date 2018/8/28 上午10:55
  **/
+@Service
 public class Classification {
+    @Resource
     private ErrorLogTypeRepository errorLogTypeRepository;
 
     /**
@@ -30,12 +34,16 @@ public class Classification {
         int timeThreshold=5;
         for(Map map:messageMap){
             String message=map.get("message").toString();
+            String loglevel=map.get("loglevel").toString();
+            String businessName=map.get("source").toString();
             ErrorLogType errorLogType=identifyErrorType(message);
             if(errorLogType!=null){
                Date lastUpdateTime= errorLogType.getLastUpdatetime();
-               long timeInterval=lastUpdateTime.getTime()-curTime.getTime();
+               long timeInterval=curTime.getTime()-lastUpdateTime.getTime();
                if(timeInterval/1000/60>timeThreshold){
                    alterInfoList.add(errorLogType);
+                   //更新lastupdate_time
+                   errorLogTypeRepository.updateMessage(message,errorLogType.getCategory());
                }
             }else{
                 String keywords="";
@@ -44,7 +52,7 @@ public class Classification {
                 for(int i=0;i<wordList.size();i++){
                    keywords=keywords+wordList.get(i)+space;
                 }
-                errorLogTypeRepository.addNewErrorLogType("","","","",keywords,message);
+                errorLogTypeRepository.addNewErrorLogType("",businessName,loglevel,wordList.get(0),keywords,message);
                 alterInfoList.add(errorLogType);
             }
 
@@ -58,11 +66,11 @@ public class Classification {
      * @return
      */
     public ErrorLogType identifyErrorType(String message){
-        double threshold=0.9;
+        double threshold=0.7;
         int beginIndex=0;
-        int endIndex=50;
-        if(message.length()>50){
-            endIndex=50;
+        int endIndex=300;
+        if(message.length()>300){
+            endIndex=300;
         }else {
             endIndex=message.length();
         }
@@ -77,9 +85,10 @@ public class Classification {
                     positive++;
                 }
             }
-            double similarityRatio=positive/keywords.length;
+            double similarityRatio=(double) positive/keywords.length;
             if (similarityRatio>threshold){
                 //识别出已有异常,返回
+                System.out.println("已有类型");
                 return errorLogType;
             }
         }
@@ -94,13 +103,14 @@ public class Classification {
     public List<String> splitString(String message){
         List<String> wordList=new ArrayList<>();
         int beginIndex=0;
-        int endIndex=50;
-        if(message.length()>50){
-            endIndex=50;
+        int endIndex=300;
+        if(message.length()>300){
+            endIndex=300;
         }else {
             endIndex=message.length();
         }
-        String[] getInfo=message.substring(beginIndex,endIndex).split(" ");
+        message=message.substring(beginIndex,endIndex);
+        String[] getInfo=message.split("\\s+");
         String pattern="^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)$";
         String pattern2="^(\\d\\d):(\\d\\d):(\\d\\d),(\\d\\d\\d|\\d\\d)$";
         for(int i=0;i<getInfo.length;i++){

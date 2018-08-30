@@ -1,4 +1,4 @@
-package com.dashu.log.Entity;
+package com.dashu.log.entity;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
