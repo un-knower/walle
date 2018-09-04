@@ -15,6 +15,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -59,7 +60,7 @@ public class EsQuery {
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.scroll(scroll);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        MatchQueryBuilder matchQueryBuilder=QueryBuilders.matchQuery(field,keyword);
+        MatchPhraseQueryBuilder matchQueryBuilder=QueryBuilders.matchPhraseQuery(field,keyword);
         RangeQueryBuilder rangeQueryBuilder=QueryBuilders.rangeQuery("@timestamp").gt(timestamp);
         searchSourceBuilder.query(QueryBuilders.boolQuery().must(matchQueryBuilder).must(rangeQueryBuilder));
         searchRequest.source(searchSourceBuilder);
@@ -70,6 +71,9 @@ public class EsQuery {
 
         List<Map> mapList = new ArrayList<>();
         while (searchHits != null && searchHits.length > 0) {
+            if (mapList.size()>100){
+                break;
+            }
             for (SearchHit hit : searchHits) {
                 Map<String, Object> map = hit.getSourceAsMap();
                 mapList.add(map);

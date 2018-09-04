@@ -29,21 +29,24 @@ public class Classification {
      */
     public List<ErrorLogType> alterInfo(List<Map> messageMap){
         List<ErrorLogType> alterInfoList=new ArrayList<>();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         Date curTime = new Date(System.currentTimeMillis());//获取当前时间
-        int timeThreshold=5;
+        int timeThreshold=25500;
         for(Map map:messageMap){
             String message=map.get("message").toString();
             String loglevel=map.get("loglevel").toString();
-            String businessName=map.get("source").toString();
+//            String businessName=map.get("source").toString();
+            Map host=(Map)map.get("host");
+            String hostname=host.get("name").toString();
+            Map<String,Object> fields=(Map)map.get("fields");
+            String topic=fields.get("log_topic").toString();
             ErrorLogType errorLogType=identifyErrorType(message);
             if(errorLogType!=null){
                Date lastUpdateTime= errorLogType.getLastUpdatetime();
                long timeInterval=curTime.getTime()-lastUpdateTime.getTime();
-               if(timeInterval/1000/60>timeThreshold){
+               if(timeInterval/1000>timeThreshold){
                    alterInfoList.add(errorLogType);
                    //更新lastupdate_time
-                   errorLogTypeRepository.updateMessage(message,errorLogType.getCategory());
+                   errorLogTypeRepository.updateMessage(message,errorLogType.getId());
                }
             }else{
                 String keywords="";
@@ -52,7 +55,7 @@ public class Classification {
                 for(int i=0;i<wordList.size();i++){
                    keywords=keywords+wordList.get(i)+space;
                 }
-                errorLogTypeRepository.addNewErrorLogType("",businessName,loglevel,wordList.get(0),keywords,message);
+                errorLogTypeRepository.addNewErrorLogType("",topic,loglevel,"",keywords,message,hostname);
                 alterInfoList.add(errorLogType);
             }
 

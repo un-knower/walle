@@ -21,8 +21,10 @@ public class ErrorLogType {
     private Timestamp createTime;
     private Timestamp lastUpdatetime;
     private String message;
-
-
+    private String hostName;
+    private String source;
+    private String alterDesc;
+    private Integer isForbid;
 
     @Id
     @Column(name = "id")
@@ -133,5 +135,45 @@ public class ErrorLogType {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Basic
+    @Column(name = "host_name")
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
+
+    @Basic
+    @Column(name = "source")
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    @Basic
+    @Column(name = "alter_desc")
+    public String getAlterDesc() {
+        return alterDesc;
+    }
+
+    public void setAlterDesc(String alterDesc) {
+        this.alterDesc = alterDesc;
+    }
+
+    @Basic
+    @Column(name = "is_forbid")
+    public Integer getIsForbid() {
+        return isForbid;
+    }
+
+    public void setIsForbid(Integer isForbid) {
+        this.isForbid = isForbid;
     }
 }

@@ -1,0 +1,27 @@
+- index: kafka
+  field: loglevel
+  keyword: ERROR
+
+- index: tidb
+  field: loglevel
+  keyword: ERROR
+
+- index: yarn
+  field: loglevel
+  keyword: ERROR
+
+- index: hive
+  field: loglevel
+  keyword: ERROR
+
+- index: zookeeper
+  field: loglevel
+  keyword: ERROR
+
+- index: hdfs
+  field: loglevel
+  keyword: ERROR
+
+- index: hue
+  field: loglevel
+  keyword: ERROR

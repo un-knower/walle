@@ -1,7 +1,0 @@
-- index: kafka
-  field: loglevel
-  keyword: warn
-
-- index: tidb
-  field: loglevel
-  keyword: warn
