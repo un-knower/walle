@@ -2,6 +2,8 @@ package com.dashu.log.classification.action;
 
 import com.dashu.log.entity.ErrorLogType;
 import com.dashu.log.classification.dao.ErrorLogTypeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,6 +21,7 @@ import java.util.regex.Pattern;
  **/
 @Service
 public class Classification {
+    private static final Logger logger = LoggerFactory.getLogger(Classification.class);
     @Resource
     private ErrorLogTypeRepository errorLogTypeRepository;
 
@@ -34,7 +37,6 @@ public class Classification {
         for(Map map:messageMap){
             String message=map.get("message").toString();
             String loglevel=map.get("loglevel").toString();
-//            String businessName=map.get("source").toString();
             Map host=(Map)map.get("host");
             String hostname=host.get("name").toString();
             Map<String,Object> fields=(Map)map.get("fields");
@@ -55,6 +57,7 @@ public class Classification {
                 for(int i=0;i<wordList.size();i++){
                    keywords=keywords+wordList.get(i)+space;
                 }
+                message=message.replace("\n","\\n");
                 errorLogTypeRepository.addNewErrorLogType("",topic,loglevel,"",keywords,message,hostname);
                 alterInfoList.add(errorLogType);
             }
@@ -70,28 +73,29 @@ public class Classification {
      */
     public ErrorLogType identifyErrorType(String message){
         double threshold=0.7;
-        int beginIndex=0;
-        int endIndex=300;
-        if(message.length()>300){
-            endIndex=300;
-        }else {
-            endIndex=message.length();
-        }
-        String getInfo=message.substring(beginIndex,endIndex);
+        String comparedMessage=message.split("\n")[0];
         List<ErrorLogType> errorLogTypesList=errorLogTypeRepository.findAll();
+
         //查看是否是已存在异常
         for(ErrorLogType errorLogType: errorLogTypesList){
             String[] keywords=errorLogType.getKeywords().split(" ");
             int positive=0;
+            int negative=0;
             for(int i=0;i<keywords.length;i++){
-                if(getInfo.contains(keywords[i])){
-                    positive++;
-                }
+                    if(filterInvalidWord(keywords[i])==false){
+                        negative++;
+                    }else{
+                        if(comparedMessage.contains(keywords[i])) {
+                            positive++;
+                        }
+                    }
+
             }
-            double similarityRatio=(double) positive/keywords.length;
+            double similarityRatio=(double) positive/(keywords.length-negative);
             if (similarityRatio>threshold){
                 //识别出已有异常,返回
-                System.out.println("已有类型");
+                logger.info("相似度："+similarityRatio);
+                logger.info("已有类型:"+errorLogType.getKeywords());
                 return errorLogType;
             }
         }
@@ -105,25 +109,42 @@ public class Classification {
      */
     public List<String> splitString(String message){
         List<String> wordList=new ArrayList<>();
-        int beginIndex=0;
-        int endIndex=300;
-        if(message.length()>300){
-            endIndex=300;
-        }else {
-            endIndex=message.length();
-        }
-        message=message.substring(beginIndex,endIndex);
-        String[] getInfo=message.split("\\s+");
-        String pattern="^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)$";
-        String pattern2="^(\\d\\d):(\\d\\d):(\\d\\d),(\\d\\d\\d|\\d\\d)$";
+        String keywords=message.split("\n")[0];
+        String[] getInfo=keywords.split(" ");
         for(int i=0;i<getInfo.length;i++){
-            if(Pattern.matches(pattern,getInfo[i])||Pattern.matches(pattern2,getInfo[i])){
-                System.out.println("filter word"+getInfo[i]);
-            }else{
                 wordList.add(getInfo[i]);
-            }
         }
         return wordList;
+    }
+
+    /**
+     * 过滤无效字符
+     * @param words
+     * @return
+     */
+    public static boolean filterInvalidWord(String words){
+        //替换特殊字符
+        words=words.replace("[","");
+        words=words.replace("]","");
+        words=words.replace("+","");
+
+        String pattern="^(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)$";
+        String pattern2="^(\\d\\d):(\\d\\d):(\\d\\d),(\\d\\d\\d|\\d\\d)$";
+        String pattern3="^(\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)$";
+        String pattern4="^(\\d\\d)/(\\S\\S\\S)/(\\d\\d\\d\\d)$";
+        String pattern5="^(\\d\\d\\d\\d)$";
+        if (Pattern.matches(pattern,words)||Pattern.matches(pattern2,words)
+                ||Pattern.matches(pattern3,words)||Pattern.matches(pattern4,words)
+                ||Pattern.matches(pattern5,words)){
+            logger.info("过滤字符：日期字符");
+            return false;
+        }
+        if (words=="ERROR"||words=="error"){
+            logger.info("过滤字符：error 关键字");
+            return false;
+        }else {
+            return true;
+        }
     }
 
 }

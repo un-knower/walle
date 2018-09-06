@@ -1,5 +1,7 @@
 package com.dashu.log.monitor.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -14,6 +16,7 @@ import java.util.Map;
  * @Date 2018/8/27 上午11:29
  **/
 public class ReadConf {
+    private static final Logger logger = LoggerFactory.getLogger(ReadConf.class);
 
     /**
      * MD5校验原配置文件是否发生改变
@@ -41,9 +44,9 @@ public class ReadConf {
         try {
             result = yaml.load(new FileInputStream(f));
         } catch (FileNotFoundException e) {
-            System.out.println("please check your yaml file");
+            logger.info("please check your yaml file");
         }
-        System.out.println(result);
+
         List<Map> resultAsListMap=(List<Map>) result;
         return resultAsListMap;
     }

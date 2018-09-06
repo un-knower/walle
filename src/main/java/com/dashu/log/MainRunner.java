@@ -31,10 +31,12 @@ public class MainRunner implements CommandLineRunner {
     private Monitor monitor;
     @Resource
     private Classification classification;
+    @Resource
+    private Alter alter;
 
     @Override
     public void run(String... args) throws Exception {
-        logger.info("walle start monitor ...");
+        logger.info("walle 开始监控 ...");
 
         int i=1;
         while (true){
@@ -48,13 +50,12 @@ public class MainRunner implements CommandLineRunner {
             //分类
             List<ErrorLogType> alterInfoList=classification.alterInfo(messageMap);
             //告警
-            Alter alter=new Alter();
             alter.alterAction(alterInfoList);
             //记录扫描日志次数
-            logger.info("walle has scanned "+i+" times");
+            logger.info("walle 已经扫描"+i+"次");
             i++;
             //等待时间设置
-            TimeUnit.SECONDS.sleep(20);
+            TimeUnit.SECONDS.sleep(5);
 
 
         }
