@@ -44,7 +44,7 @@ public class ReadConf {
         try {
             result = yaml.load(new FileInputStream(f));
         } catch (FileNotFoundException e) {
-            logger.info("please check your yaml file");
+            logger.error("please check your yaml file");
         }
 
         List<Map> resultAsListMap=(List<Map>) result;

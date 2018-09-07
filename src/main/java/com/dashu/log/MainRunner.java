@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Component
 public class MainRunner implements CommandLineRunner {
-    private static final  String YML_PATH="/Users/dashu/xyc/walle/src/main/resources/static/monitor.yml";
+    private static final  String YML_PATH="/etc/monitor.yml";
     private static final Logger logger = LoggerFactory.getLogger(MainRunner.class);
 
     @Resource
@@ -44,6 +44,7 @@ public class MainRunner implements CommandLineRunner {
             List<Map> messageMap= null;
             try {
                 messageMap = monitor.getMonitorInfo(YML_PATH);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

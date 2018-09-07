@@ -57,7 +57,7 @@ public class Alter {
                 String info="\n"+"日志等级："+logLevel+"\n"+"业务名称："+businessName+"\n"+"主机名："+hostname+"\n"+"错误信息："+keywords+"\n";
                 String altermessage=AlterInfoConstruction(altername,info,errroTypeId);
 
-                String url="http://10.1.3.116:9093/api/v1/alerts";
+                String url="http://10.1.3.124:9093/api/v1/alerts";
                 HttpPost httpPost = new HttpPost(url);
                 CloseableHttpClient client = HttpClients.createDefault();
                 StringEntity entity = new StringEntity(altermessage,"utf-8");//解决中文乱码问题

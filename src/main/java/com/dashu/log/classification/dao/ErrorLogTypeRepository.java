@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
  **/
 public interface ErrorLogTypeRepository extends JpaRepository<ErrorLogType,Long> {
 
-//    @Query(value = "select e.isForbid from ErrorLogType e where e.message=?1")
-//    Integer isForbid(String message);
+
+
 
     @Modifying
     @Transactional

@@ -33,7 +33,7 @@ public class Classification {
     public List<ErrorLogType> alterInfo(List<Map> messageMap){
         List<ErrorLogType> alterInfoList=new ArrayList<>();
         Date curTime = new Date(System.currentTimeMillis());//获取当前时间
-        int timeThreshold=25500;
+        int timeThreshold=5;
         for(Map map:messageMap){
             String message=map.get("message").toString();
             String loglevel=map.get("loglevel").toString();
@@ -45,10 +45,12 @@ public class Classification {
             if(errorLogType!=null){
                Date lastUpdateTime= errorLogType.getLastUpdatetime();
                long timeInterval=curTime.getTime()-lastUpdateTime.getTime();
-               if(timeInterval/1000>timeThreshold){
+               if(timeInterval/1000/60>timeThreshold){
                    alterInfoList.add(errorLogType);
                    //更新lastupdate_time
                    errorLogTypeRepository.updateMessage(message,errorLogType.getId());
+               }else{
+                   logger.info("5分钟内已出现过相同错误！");
                }
             }else{
                 String keywords="";
@@ -60,6 +62,7 @@ public class Classification {
                 message=message.replace("\n","\\n");
                 errorLogTypeRepository.addNewErrorLogType("",topic,loglevel,"",keywords,message,hostname);
                 alterInfoList.add(errorLogType);
+                logger.info("添加新错误类型："+keywords);
             }
 
         }

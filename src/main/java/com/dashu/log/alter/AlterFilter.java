@@ -1,5 +1,6 @@
 package com.dashu.log.alter;
 
+import com.dashu.log.alter.dao.AlterHistoryRepository;
 import com.dashu.log.classification.dao.FilterErrorTypeRepository;
 import com.dashu.log.entity.ErrorLogType;
 import org.slf4j.Logger;
@@ -7,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -19,6 +19,8 @@ import java.util.List;
 public class AlterFilter {
     @Autowired
     private FilterErrorTypeRepository filterErrorTypeRepository;
+    @Autowired
+    private AlterHistoryRepository alterHistoryRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AlterFilter.class);
 
@@ -48,6 +50,8 @@ public class AlterFilter {
             logger.info("告警信息过短");
             return false;
         }else{
+            alterHistoryRepository.addAlterHistory(alterInfo.getId(),alterInfo.getBusinessName(),alterInfo.getLogLevel(),alterInfo.getKeywords(),
+                    alterInfo.getMessage(),alterInfo.getHostName());
             logger.info("walle 发出告警信息: "+alterInfo.getKeywords());
             return true;
         }
