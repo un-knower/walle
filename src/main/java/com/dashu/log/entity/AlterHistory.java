@@ -17,9 +17,11 @@ public class AlterHistory {
     private String businessName;
     private String logLevel;
     private String category;
+    @Column(columnDefinition="text")
     private String keywords;
     private Timestamp createTime;
     private Timestamp lastUpdatetime;
+    @Column(columnDefinition="longtext")
     private String message;
     private String hostName;
     private String source;

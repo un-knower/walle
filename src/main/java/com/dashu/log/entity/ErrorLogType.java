@@ -21,7 +21,7 @@ public class ErrorLogType {
     private String keywords;
     private Timestamp createTime;
     private Timestamp lastUpdatetime;
-    @Column(columnDefinition="text")
+    @Column(columnDefinition="longtext")
     private String message;
     private String hostName;
     private String source;
