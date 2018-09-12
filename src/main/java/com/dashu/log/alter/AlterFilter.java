@@ -50,9 +50,10 @@ public class AlterFilter {
             logger.info("告警信息过短");
             return false;
         }else{
+            String altermessage=alterInfo.getMessage().split("\n")[0];
             alterHistoryRepository.addAlterHistory(alterInfo.getId(),alterInfo.getBusinessName(),alterInfo.getLogLevel(),alterInfo.getKeywords(),
                     alterInfo.getMessage(),alterInfo.getHostName());
-            logger.info("walle 发出告警信息: "+alterInfo.getKeywords());
+            logger.info("walle 发出告警信息: "+altermessage);
             return true;
         }
 

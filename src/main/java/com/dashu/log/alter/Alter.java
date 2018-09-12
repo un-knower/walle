@@ -49,13 +49,13 @@ public class Alter {
                 String businessName = alterInfo.getBusinessName();
                 String logLevel = alterInfo.getLogLevel();
                 String hostname = alterInfo.getHostName();
-//                String message = alterInfo.getMessage();
-                String keywords=alterInfo.getKeywords();
+                String message = alterInfo.getMessage().split("\n")[0];
+//                String keywords=alterInfo.getKeywords();
                 Integer errroTypeId=alterInfo.getId();
                 Date curTime = new Date(System.currentTimeMillis());
                 String altername=curTime.toString();
-                String info="\n"+"日志等级："+logLevel+"\n"+"业务名称："+businessName+"\n"+"主机名："+hostname+"\n"+"错误信息："+keywords+"\n";
-                String altermessage=AlterInfoConstruction(altername,info,errroTypeId);
+                String info="错误ID:"+errroTypeId+"\n"+"日志等级："+logLevel+"\n"+"业务名称："+businessName+"\n"+"主机名："+hostname+"\n"+"错误信息："+message+"\n";
+                String altermessage=AlterInfoConstruction(altername,info);
 
                 String url="http://10.1.3.124:9093/api/v1/alerts";
                 HttpPost httpPost = new HttpPost(url);
@@ -80,14 +80,14 @@ public class Alter {
      * @param info
      * @return
      */
-    public static String AlterInfoConstruction(String altername,String info,Integer errorTypeId){
+    public static String AlterInfoConstruction(String altername,String info){
         JSONArray jsonArray=new JSONArray();
 
 
         JSONObject labelsObject=new JSONObject();
         labelsObject.put("altername",altername);
-        labelsObject.put("dev","错误ID:");
-        labelsObject.put( "instance",errorTypeId.toString());
+//        labelsObject.put("dev","错误ID:");
+//        labelsObject.put( "instance",errorTypeId.toString());
 
         JSONObject labels=new JSONObject();
         labels.put("labels",labelsObject);

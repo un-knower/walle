@@ -3,6 +3,8 @@ package com.dashu.log.monitor.action;
 import com.dashu.log.monitor.EsQuery;
 import com.dashu.log.monitor.dao.QueryHistoryRepository;
 import com.dashu.log.monitor.util.ReadConf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.Map;
  **/
 @Service
 public class Monitor {
+    private static final Logger logger = LoggerFactory.getLogger(Monitor.class);
 
     @Autowired
     private QueryHistoryRepository queryHistoryRepository;
@@ -39,21 +42,27 @@ public class Monitor {
             String index=map.get("index").toString();
             String field=map.get("field").toString();
             String keyword=map.get("keyword").toString();
+            logger.info("开始查询："+index);
             // 从对应表中查出历史记录时间
             String oldTimestamp=queryHistoryRepository.findOldestTimestampByIndexName(index);
+            logger.info(index+" 最新查询时间戳 "+oldTimestamp);
             if (oldTimestamp==null||oldTimestamp==""){
                 oldTimestamp="2018-08-23T10:41:45.230Z";
                 queryHistoryRepository.insertQueryHistory(index,oldTimestamp);
             }
+            //获取es记录最新时间
+            String latestTimestamp=esQuery.getLatestTime();
+            //获取关键字查询结果
             List<Map> resultMap=esQuery.filterSearch(index,field,keyword,oldTimestamp);
-            List<String> oldTimestamplist=new ArrayList<>();
+
             if(resultMap.size()!=0){
                 for(Map result: resultMap ){
                     messageMap.add(result);
-                    oldTimestamplist.add(result.get("@timestamp").toString());
                 }
                 //更新时间
-                queryHistoryRepository.updateOldTimestampByIndexName(Collections.max(oldTimestamplist),index);
+                queryHistoryRepository.updateOldTimestampByIndexName(latestTimestamp,index);
+            }else{
+                logger.info(index+" 中没有ERROR日志");
             }
         }
         return messageMap;

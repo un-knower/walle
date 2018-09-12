@@ -1,6 +1,6 @@
 package com.dashu.log.monitor;
 
-import com.dashu.log.monitor.dao.QueryHistoryRepository;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -16,13 +16,13 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
+
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.elasticsearch.search.sort.SortOrder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +36,28 @@ import java.util.Map;
  **/
 
 public class EsQuery {
+
+
+    /**
+     *
+     * @return 获取最新时间
+     * @throws IOException
+     */
+    public String getLatestTime() throws IOException {
+        RestHighLevelClient client=connect();
+        SearchRequest searchRequest=new SearchRequest("kafka");
+        SearchSourceBuilder searchSourceBuilder=new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        searchSourceBuilder.sort("@timestamp",SortOrder.DESC);
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse response=client.search(searchRequest);
+        String lasttime=response.getHits().getHits()[0].getSourceAsMap().get("@timestamp").toString();
+        client.close();
+
+        return lasttime;
+
+    }
 
     /**
      * 关键字过滤查询
