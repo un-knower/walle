@@ -37,7 +37,6 @@ import java.util.Map;
 
 public class EsQuery {
 
-
     /**
      *
      * @return 获取最新时间
@@ -66,7 +65,7 @@ public class EsQuery {
      * @return
      * @throws IOException
      */
-    public  List<Map> filterSearch(String index,String field,String keyword,String timestamp) throws IOException {
+    public static List<Map> filterSearch(String index,String field,String keyword,String timestamp) throws IOException {
         if (index==null||index==""){
             index="kafka";
         }
@@ -98,6 +97,7 @@ public class EsQuery {
             }
             for (SearchHit hit : searchHits) {
                 Map<String, Object> map = hit.getSourceAsMap();
+//                System.out.println("xyc"+map.get("message"));
                 mapList.add(map);
             }
             SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
