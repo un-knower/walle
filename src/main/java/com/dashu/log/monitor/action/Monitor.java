@@ -54,13 +54,13 @@ public class Monitor {
             String latestTimestamp=esQuery.getLatestTime();
             //获取关键字查询结果
             List<Map> resultMap=esQuery.filterSearch(index,field,keyword,oldTimestamp);
-
+            //更新时间
+            queryHistoryRepository.updateOldTimestampByIndexName(latestTimestamp,index);
             if(resultMap.size()!=0){
                 for(Map result: resultMap ){
                     messageMap.add(result);
                 }
-                //更新时间
-                queryHistoryRepository.updateOldTimestampByIndexName(latestTimestamp,index);
+
             }else{
                 logger.info(index+" 中没有ERROR日志");
             }

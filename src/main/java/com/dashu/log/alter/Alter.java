@@ -66,6 +66,7 @@ public class Alter {
                 httpPost.setEntity(entity);
                 try {
                     client.execute(httpPost);
+                    client.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

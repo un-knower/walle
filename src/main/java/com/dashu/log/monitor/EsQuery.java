@@ -36,6 +36,13 @@ import java.util.Map;
  **/
 
 public class EsQuery {
+//    public static void main(String[] args){
+//        try {
+//            filterSearch("kafka","loglevel","error","2018-09-13T07:07:13.686Z");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      *
@@ -97,7 +104,7 @@ public class EsQuery {
             }
             for (SearchHit hit : searchHits) {
                 Map<String, Object> map = hit.getSourceAsMap();
-//                System.out.println("xyc"+map.get("message"));
+                System.out.println("xyc"+map.get("message"));
                 mapList.add(map);
             }
             SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
