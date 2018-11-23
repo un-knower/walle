@@ -1,4 +1,4 @@
-package com.dashu.log.monitor.util;
+package com.dashu.log.util;
 
 import java.io.File;
 import java.io.FileInputStream;

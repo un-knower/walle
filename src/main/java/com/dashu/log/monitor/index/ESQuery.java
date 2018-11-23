@@ -1,5 +1,4 @@
-package com.dashu.log.monitor;
-
+package com.dashu.log.monitor.index;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -16,13 +15,14 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
-
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,31 +30,35 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description es相关查询操作
+ * @Description index查询相关操作
  * @Author: xuyouchang
- * @Date 2018/8/27 上午10:43
+ * @Date 2018/11/22 下午5:19
  **/
-
-public class EsQuery {
+public class ESQuery {
+    private static final Logger logger = LoggerFactory.getLogger(ESQuery.class);
     /**
      *
      * @return 获取最新时间
      * @throws IOException
      */
-    public String getLatestTime() throws IOException {
+    public String getLatestTime(String index)  {
         RestHighLevelClient client=connect();
-        SearchRequest searchRequest=new SearchRequest("kafka");
+        SearchRequest searchRequest=new SearchRequest(index);
         SearchSourceBuilder searchSourceBuilder=new SearchSourceBuilder();
         searchSourceBuilder.query(QueryBuilders.matchAllQuery());
         searchSourceBuilder.sort("@timestamp",SortOrder.DESC);
         searchRequest.source(searchSourceBuilder);
 
-        SearchResponse response=client.search(searchRequest);
-        String lasttime=response.getHits().getHits()[0].getSourceAsMap().get("@timestamp").toString();
-        client.close();
-
-        return lasttime;
-
+        SearchResponse response= null;
+        try {
+            response = client.search(searchRequest);
+            String lasttime=response.getHits().getHits()[0].getSourceAsMap().get("@timestamp").toString();
+            client.close();
+            return lasttime;
+        } catch (IOException e) {
+            logger.error("get latest time fail:"+e.toString());
+            return null;
+        }
     }
 
     /**
@@ -64,15 +68,18 @@ public class EsQuery {
      * @return
      * @throws IOException
      */
-    public static List<Map> filterSearch(String index,String field,String keyword,String timestamp) throws IOException {
+    public  List<Map> filterSearch(String index, String field, String keyword, String timestamp) {
         if (index==null||index==""){
-            index="kafka";
+            logger.error("filter search option is failed, because lack of index");
+            return null;
         }
         if (field==null||field==""){
-            field="loglevel";
+            logger.error("filter search option is failed, because lack of field");
+            return null;
         }
         if (keyword==null||keyword==""){
-            keyword="ERROR";
+            logger.error("filter search option is failed, because lack of keyword");
+            return null;
         }
 
         RestHighLevelClient client=connect();
@@ -84,30 +91,34 @@ public class EsQuery {
         RangeQueryBuilder rangeQueryBuilder=QueryBuilders.rangeQuery("@timestamp").gt(timestamp);
         searchSourceBuilder.query(QueryBuilders.boolQuery().must(matchQueryBuilder).must(rangeQueryBuilder));
         searchRequest.source(searchSourceBuilder);
+        try{
+            SearchResponse searchResponse = client.search(searchRequest);
+            String scrollId = searchResponse.getScrollId();
+            SearchHit[] searchHits = searchResponse.getHits().getHits();
 
-        SearchResponse searchResponse = client.search(searchRequest);
-        String scrollId = searchResponse.getScrollId();
-        SearchHit[] searchHits = searchResponse.getHits().getHits();
+            List<Map> mapList = new ArrayList<>();
+            while (searchHits != null && searchHits.length > 0) {
+                if (mapList.size()>100){
+                    break;
+                }
+                for (SearchHit hit : searchHits) {
+                    Map<String, Object> map = hit.getSourceAsMap();
+                    mapList.add(map);
+                }
+                SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+                scrollRequest.scroll(scroll);
+                searchResponse = client.searchScroll(scrollRequest);
+                scrollId = searchResponse.getScrollId();
+                searchHits = searchResponse.getHits().getHits();
 
-        List<Map> mapList = new ArrayList<>();
-        while (searchHits != null && searchHits.length > 0) {
-            if (mapList.size()>100){
-                break;
             }
-            for (SearchHit hit : searchHits) {
-                Map<String, Object> map = hit.getSourceAsMap();
-                System.out.println("xyc"+map.get("message"));
-                mapList.add(map);
-            }
-            SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
-            scrollRequest.scroll(scroll);
-            searchResponse = client.searchScroll(scrollRequest);
-            scrollId = searchResponse.getScrollId();
-            searchHits = searchResponse.getHits().getHits();
-
+            client.close();
+            return mapList;
+        }catch (IOException e){
+            logger.error("filter search request is failed !");
+            return null;
         }
-        client.close();
-        return mapList;
+
     }
 
     /**
@@ -137,6 +148,4 @@ public class EsQuery {
                 }).setMaxRetryTimeoutMillis(600000));
         return client;
     }
-
-
 }

@@ -2,10 +2,6 @@
   field: loglevel
   keyword: ERROR
 
-- index: tidb
-  field: loglevel
-  keyword: ERROR
-
 - index: yarn
   field: loglevel
   keyword: ERROR
