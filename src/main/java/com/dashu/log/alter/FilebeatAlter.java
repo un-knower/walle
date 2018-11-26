@@ -13,12 +13,14 @@ import org.slf4j.LoggerFactory;
 public class FilebeatAlter {
     private static final Logger logger = LoggerFactory.getLogger(FilebeatAlter.class);
     private static String HOSTNAME = null;
-    private static String SSH_BASE_CMD = "ssh root@"+HOSTNAME+" ";
+    private static String SSH_BASE_CMD = null;
     private static final String START_FILEBEAT = "nohup filebeat -e -c /etc/filebeat/filebeat.yml -d 'publish' >/data0/log/filebeat/filebeat.log 2>&1 &";
-    private static final String  START_FILEBEAT_CMD = SSH_BASE_CMD + START_FILEBEAT;
+    private static  String  START_FILEBEAT_CMD = null;
 
     public FilebeatAlter(String hostname){
         this.HOSTNAME = hostname;
+        this.SSH_BASE_CMD = "ssh root@"+this.HOSTNAME+" ";
+        this.START_FILEBEAT_CMD = this.SSH_BASE_CMD + this.START_FILEBEAT;
     }
 
     /**

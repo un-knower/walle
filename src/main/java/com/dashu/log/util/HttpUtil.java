@@ -58,13 +58,12 @@ public class HttpUtil {
      * @param url
      * @return 请求结果
      */
-    public String get(String url) {
+    public String get(String url) throws IOException {
         HttpGet httpGet = new HttpGet(url);
         HttpClient client = HttpClients.createDefault();
         HttpResponse response = null;
         String line;
         String result = "";
-        try {
             response = client.execute(httpGet);
             HttpEntity entity = response.getEntity();
             BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -73,9 +72,6 @@ public class HttpUtil {
                 result += line;
             }
             ((CloseableHttpClient) client).close();
-        }catch (Exception e){
-            logger.error(e.toString());
-        }
         return result;
     }
 }

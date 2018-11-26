@@ -1,0 +1,19 @@
+filebeat.config.inputs:
+  enabled: true
+  path: configs/*.yml
+  reload.enabled: true
+  reload.period: 10s
+
+output.kafka:
+   enbaled: true
+   hosts: ["es1:9092","es2:9092","es3:9092"]
+   topic: '%{[fields.log_topic]}'
+   partition.round_robin:
+     reachable_only: false
+   required_acks: 1
+   compression: gzip
+   max_message_bytes: 1000000
+
+http:
+   enabled: true
+   host: xyc

@@ -1,0 +1,4 @@
+multiline:
+        pattern: '^[[:space:]]+(at|\.{3})\b|^Caused by:'
+        negate: false
+        match: after

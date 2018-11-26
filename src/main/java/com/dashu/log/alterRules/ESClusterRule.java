@@ -2,6 +2,8 @@ package com.dashu.log.alterRules;
 
 import com.dashu.log.alter.WalleNotify;
 import com.dashu.log.monitor.cluster.Cluster;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @Description
@@ -9,6 +11,7 @@ import com.dashu.log.monitor.cluster.Cluster;
  * @Date 2018/11/22 下午5:09
  **/
 public class ESClusterRule {
+    private static final Logger logger = LoggerFactory.getLogger(ESIndexRule.class);
 
     /**
      * es集群是否健康
@@ -19,6 +22,10 @@ public class ESClusterRule {
         if (!ishealth){
             WalleNotify notify =new WalleNotify();
             notify.sendMessage("es cluster","es cluster is not health now, please check it!");
+            logger.warn("es cluster is not health now, please check it!");
+        }else {
+            logger.info("es cluster is health!");
         }
+
     }
 }

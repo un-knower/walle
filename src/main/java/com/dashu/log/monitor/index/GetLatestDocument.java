@@ -1,5 +1,7 @@
 package com.dashu.log.monitor.index;
 
+import com.dashu.log.entity.IndexConf;
+import com.dashu.log.monitor.dao.IndexConfRepository;
 import com.dashu.log.monitor.dao.QueryHistoryRepository;
 import com.dashu.log.util.ReadConf;
 import org.slf4j.Logger;
@@ -22,22 +24,23 @@ public class GetLatestDocument {
 
     @Resource
     private QueryHistoryRepository queryHistoryRepository;
+    @Resource
+    private IndexConfRepository indexConfRepository;
 
     /**
      * 获取最新document，并更新index的检测时间点
-     * @param indexConfPath
+     *
      * @return
      */
-    public List<Map> getLatestDoc(String indexConfPath){
-        ReadConf readConf = new ReadConf();
-        List<Map> indexConfMap = readConf.readYml(indexConfPath);
+    public List<Map> getLatestDoc(){
+        List<IndexConf> indexConfList = indexConfRepository.getAllConf();
         List<Map> latestDocMap = new ArrayList<>();
         ESQuery esQuery = new ESQuery();
 
-        for (Map map: indexConfMap){
-            String index=map.get("index").toString();
-            String field=map.get("field").toString();
-            String keyword=map.get("keyword").toString();
+        for (IndexConf indexConf: indexConfList){
+            String index = indexConf.getIndex();
+            String field = indexConf.getFiled();
+            String keyword = indexConf.getKeywords();
             // 获取上次查询时间游标
             String timeCursor=queryHistoryRepository.findOldestTimestampByIndexName(index);
             if (timeCursor==null||timeCursor==""){

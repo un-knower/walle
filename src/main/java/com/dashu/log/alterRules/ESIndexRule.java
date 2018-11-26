@@ -3,7 +3,9 @@ package com.dashu.log.alterRules;
 import com.dashu.log.alter.WalleNotify;
 import com.dashu.log.classification.dao.ErrorLogTypeRepository;
 import com.dashu.log.entity.ErrorLogType;
+import com.dashu.log.entity.IndexConf;
 import com.dashu.log.filter.DocFilter;
+import com.dashu.log.monitor.dao.IndexConfRepository;
 import com.dashu.log.monitor.index.GetLatestDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,6 @@ import java.util.regex.Pattern;
 @Service
 public class ESIndexRule {
     private static final Logger logger = LoggerFactory.getLogger(ESIndexRule.class);
-    private static final String INDEX_CONF_PATH = "/Users/dashu/xyc/zero/monitor/walle/src/main/resources/static/monitor.yml";
     private static final double SIMILARITY_RATIO = 0.7;
     @Resource
     private ErrorLogTypeRepository errorLogTypeRepository;
@@ -32,11 +33,12 @@ public class ESIndexRule {
     @Resource
     private GetLatestDocument latestDocument;
 
+
     /**
      * 是否出现error等级日志
      */
     public void isError(){
-        List<Map> messageMap = latestDocument.getLatestDoc(INDEX_CONF_PATH);
+        List<Map> messageMap = latestDocument.getLatestDoc();
         WalleNotify notify = new WalleNotify();
         for (Map map : messageMap){
             String message=map.get("message").toString();

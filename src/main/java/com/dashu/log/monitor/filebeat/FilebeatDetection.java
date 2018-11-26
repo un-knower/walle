@@ -5,6 +5,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 
 /**
  * @Description filebeat检测
@@ -14,11 +16,13 @@ import org.slf4j.LoggerFactory;
 public class FilebeatDetection {
     private static final Logger logger = LoggerFactory.getLogger(FilebeatDetection.class);
     private static String HOSTNAME = null;
-    private static String STATS_URL = "http://"+HOSTNAME+":5066/stats";
-    private static String INFO_URL = "http://"+HOSTNAME+":5066/";
+    private static String STATS_URL = null;
+    private static String INFO_URL = null;
 
     public FilebeatDetection(String hostname){
         this.HOSTNAME = hostname;
+        this.STATS_URL = "http://"+this.HOSTNAME+":5066/stats";
+        this.INFO_URL = "http://"+ this.HOSTNAME+":5066/";
     }
 
     /**
@@ -27,14 +31,12 @@ public class FilebeatDetection {
      */
     public boolean isAlive(){
         HttpUtil httpUtil = new HttpUtil(this);
-        String result = httpUtil.get(INFO_URL);
-        JSONObject jsonObject = new JSONObject(result);
-        String hostname = jsonObject.get("hostname").toString();
-        if (hostname!=null){
-            logger.info(hostname+" is alive!");
+        try {
+
+            String result = httpUtil.get(this.INFO_URL);
             return true;
-        }else {
-            logger.warn(hostname+" is not alive!");
+        } catch (IOException e) {
+            logger.error(e.toString());
             return false;
         }
     }
@@ -45,7 +47,12 @@ public class FilebeatDetection {
     // TODO: 2018/11/21 解析filebeat状态
     public void checkStats(){
         HttpUtil httpUtil =new HttpUtil(this);
-        String result = httpUtil.get(STATS_URL);
+        String result = null;
+        try {
+            result = httpUtil.get(STATS_URL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         JSONObject jsonObject = new JSONObject(result);
         String beat = jsonObject.get("beat").toString();
         String libbeat = jsonObject.get("libbeat").toString();
