@@ -1,7 +1,8 @@
 package com.dashu.log.monitor.index;
 
+import com.dashu.log.client.dao.IndexConfRepository;
 import com.dashu.log.entity.IndexConf;
-import com.dashu.log.monitor.dao.IndexConfRepository;
+
 import com.dashu.log.monitor.dao.QueryHistoryRepository;
 import com.dashu.log.util.ReadConf;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class GetLatestDocument {
      * @return
      */
     public List<Map> getLatestDoc(){
-        List<IndexConf> indexConfList = indexConfRepository.getAllConf();
+        List<IndexConf> indexConfList = indexConfRepository.getAllIndexConf();
         List<Map> latestDocMap = new ArrayList<>();
         ESQuery esQuery = new ESQuery();
 

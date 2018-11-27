@@ -11,8 +11,9 @@ import java.util.List;
  * @Author: xuyouchang
  * @Date 2018/11/26 上午10:49
  **/
-public interface IndexConfRepository extends JpaRepository<IndexConf,Long> {
+public interface IndexConfRepository1 extends JpaRepository<IndexConf,Long> {
 
     @Query(value = "select t.id,t.filed,t.index,t.keywords from index_conf as t ",nativeQuery = true)
     List<IndexConf> getAllConf();
+
 }

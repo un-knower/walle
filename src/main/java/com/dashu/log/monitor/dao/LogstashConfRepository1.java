@@ -11,7 +11,7 @@ import java.util.List;
  * @Author: xuyouchang
  * @Date 2018/11/26 下午5:33
  **/
-public interface LogstashConfRepository extends JpaRepository<LogstashConf,Long> {
+public interface LogstashConfRepository1 extends JpaRepository<LogstashConf,Long> {
 
     @Query(value = "select t.id,t.hostname from logstash_conf as t",nativeQuery = true)
     List<LogstashConf> getAllHostname();

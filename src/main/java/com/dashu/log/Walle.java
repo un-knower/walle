@@ -3,11 +3,12 @@ package com.dashu.log;
 import com.dashu.log.alter.ESClusterAlter;
 import com.dashu.log.alter.IndexAlter;
 import com.dashu.log.alter.multiThread.LogstashThread;
+import com.dashu.log.client.dao.LogstashConfRepository;
 import com.dashu.log.entity.FilebeatConf;
 import com.dashu.log.entity.LogstashConf;
 import com.dashu.log.monitor.dao.FileBeatConfRepository;
 import com.dashu.log.alter.multiThread.FilebeatThread;
-import com.dashu.log.monitor.dao.LogstashConfRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,11 +34,11 @@ public class Walle {
     /**
      * logstash
      */
-    @Scheduled(cron = "* */5 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void logstashAlter(){
-        List<LogstashConf> logstashConfList = logstashConfRepository.getAllHostname();
-        for (LogstashConf logstashConf : logstashConfList){
-            LogstashThread logstashThread = new LogstashThread(logstashConf.getHostname());
+        List<String> hostanmelist = logstashConfRepository.getAllHostanme();
+        for (String hostname : hostanmelist){
+            LogstashThread logstashThread = new LogstashThread(hostname);
             logstashThread.start();
         }
     }
@@ -47,7 +48,7 @@ public class Walle {
      */
     @Scheduled(cron = "*/5 * * * * *")
     public void indexAlter(){
-        indexAlter.alter();
+//        indexAlter.alter();
     }
 
     /**
@@ -65,7 +66,7 @@ public class Walle {
     /**
      * es cluster
      */
-    @Scheduled(cron = "* */5 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void esClusterAlter(){
         ESClusterAlter esClusterAlter = new ESClusterAlter();
         esClusterAlter.alter();
