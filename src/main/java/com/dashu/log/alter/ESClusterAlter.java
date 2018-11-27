@@ -15,5 +15,6 @@ public class ESClusterAlter {
     public void alter(){
         ESClusterRule esClusterRule = new ESClusterRule();
         esClusterRule.isHealthRule();
+        esClusterRule.isReject();
     }
 }
