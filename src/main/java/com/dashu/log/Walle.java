@@ -46,7 +46,7 @@ public class Walle {
     /**
      * es index
      */
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     public void indexAlter(){
         indexAlter.alter();
     }

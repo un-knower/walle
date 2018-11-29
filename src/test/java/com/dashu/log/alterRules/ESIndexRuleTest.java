@@ -16,11 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @Author: xuyouchang
  * @Date 2018/11/29 上午10:04
  **/
-@RunWith(SpringRunner.class)
-@SpringBootTest
 class ESIndexRuleTest {
-    @Resource
-    private ESIndexRule esIndexRule;
 
     @BeforeEach
     void setUp() {

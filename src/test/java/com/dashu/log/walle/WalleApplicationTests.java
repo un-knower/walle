@@ -14,16 +14,11 @@ import javax.annotation.Resource;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class WalleApplicationTests {
-    @Autowired
-    private QueryHistoryRepository queryHistoryRepository;
-    @Resource
-    private IndexConfRepository1 indexConfRepository;
 
 
     @Test
     public void contextLoads() {
-        LogstashDetect logstashDetect = new LogstashDetect("es1");
-        logstashDetect.isAlive();
+
     }
 
 }
