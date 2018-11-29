@@ -14,25 +14,40 @@ es: 集群健康检测、索引插入拒绝数检测
 
 ## 客户端模块
 restful形式进行动态的查看或添加、修改配置
+
 **添加filebeat配置**
+
 GET /filebeat/addFilebeatConf 
 Param: hostname
+
 **查看filebeat配置**
+
 GET /filebeat/getFilebeatConf
+
 **添加logstash配置**
+
 GET /logstash/addLogstashConf
 Param: hostname
+
 **查看logstash配置**
+
 GET /logstash/getLogstashConf
+
 **查看index配置**
 GET /index/getAllIndexConf
+
 **添加index配置**
+
 GET /index/addIndexConf
 Param:index,filed,keywords
+
 **添加forbid doc id**
+
 GET /index/addForbidId
 Param: errorTypeId
+
 **查看forbid doc id**
+
 GET /index/getAllForbidId
 
 ## 调度模块
