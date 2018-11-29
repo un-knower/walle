@@ -3,7 +3,6 @@ package com.dashu.log.client;
 
 import com.dashu.log.client.dao.ErrorTypeIdRepository;
 import com.dashu.log.client.dao.IndexConfRepository;
-import com.dashu.log.entity.ErrorLogType;
 import com.dashu.log.entity.IndexConf;
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,5 +1,6 @@
 package com.dashu.log.client;
 
+import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -13,15 +14,27 @@ import java.text.MessageFormat;
 public class ClientUtil {
 
     public String successMessage(String data){
-
-        return MessageFormat.format("['errorType': 0,'status': 'success','datas': {0}]",data);
+        data = data.replace('"','\'');
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status","success");
+        jsonObject.put("datas",data);
+        jsonObject.put("errortype",0);
+        return jsonObject.toString();
     }
 
     public String nullMessage(){
-        return "{'errorType': -1,'result': 'the message is null'}";
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status","the message is null");
+        jsonObject.put("errortype",-1);
+        return jsonObject.toString();
     }
 
     public String failMessage(String error){
-        return MessageFormat.format("['errorType': 1,'status': 'fail','datas': {0}]",error);
+        error = error.replace('"','\'');
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status","fail");
+        jsonObject.put("datas",error);
+        jsonObject.put("errortype",1);
+        return jsonObject.toString();
     }
 }

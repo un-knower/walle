@@ -25,41 +25,28 @@ public class GetLatestDocument {
 
     @Resource
     private QueryHistoryRepository queryHistoryRepository;
-    @Resource
-    private IndexConfRepository indexConfRepository;
 
     /**
      * 获取最新document，并更新index的检测时间点
      *
      * @return
      */
-    public List<Map> getLatestDoc(){
-        List<IndexConf> indexConfList = indexConfRepository.getAllIndexConf();
-        List<Map> latestDocMap = new ArrayList<>();
+    public List<Map> getLatestDoc(IndexConf indexConf){
         ESQuery esQuery = new ESQuery();
+        String index = indexConf.getIndex();
+        String field = indexConf.getFiled();
+        String keyword = indexConf.getKeywords();
 
-        for (IndexConf indexConf: indexConfList){
-            String index = indexConf.getIndex();
-            String field = indexConf.getFiled();
-            String keyword = indexConf.getKeywords();
-            // 获取上次查询时间游标
-            String timeCursor=queryHistoryRepository.findOldestTimestampByIndexName(index);
-            if (timeCursor==null||timeCursor==""){
-                timeCursor="2018-08-23T10:41:45.230Z";
-                queryHistoryRepository.insertQueryHistory(index,timeCursor);
-            }
-            //获取es记录最新时间
-            String latestTimestamp=esQuery.getLatestTime(index);
-            List<Map> resultMap=esQuery.filterSearch(index,field,keyword,timeCursor);
-            //更新时间游标
-            queryHistoryRepository.updateOldTimestampByIndexName(latestTimestamp,index);
-            if(resultMap.size()!=0){
-                for(Map result: resultMap ){
-                    latestDocMap.add(result);
-                }
-            }
+        String timeCursor=queryHistoryRepository.findOldestTimestampByIndexName(index); // 获取上次查询时间游标
+        if (timeCursor==null||timeCursor==""){
+            timeCursor="2018-08-23T10:41:45.230Z";
+            queryHistoryRepository.insertQueryHistory(index,timeCursor);
         }
-        return latestDocMap;
+        String latestTimestamp=esQuery.getLatestTime(index);                //获取es记录最新时间
+        List<Map> latestDoc=esQuery.filterSearch(index,field,keyword,timeCursor);
+        queryHistoryRepository.updateOldTimestampByIndexName(latestTimestamp,index);                //更新时间游标
+
+        return latestDoc;
 
 
     }

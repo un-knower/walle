@@ -1,8 +1,10 @@
 package com.dashu.log.alterRules;
 
-import com.dashu.log.alter.WalleNotify;
+import com.dashu.log.alterRules.multiThread.IndexMultiThread;
 import com.dashu.log.classification.dao.ErrorLogTypeRepository;
+import com.dashu.log.client.dao.IndexConfRepository;
 import com.dashu.log.entity.ErrorLogType;
+import com.dashu.log.entity.IndexConf;
 import com.dashu.log.filter.DocFilter;
 import com.dashu.log.monitor.index.GetLatestDocument;
 import org.slf4j.Logger;
@@ -16,7 +18,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * @Description
+ * @Description document 监控
  * @Author: xuyouchang
  * @Date 2018/11/23 上午9:39
  **/
@@ -30,44 +32,21 @@ public class ESIndexRule {
     private DocFilter docFilter;
     @Resource
     private GetLatestDocument latestDocument;
+    @Resource
+    private IndexConfRepository indexConfRepository;
 
 
     /**
      * 是否出现error等级日志
      */
     public void isError(){
-        List<Map> messageMap = latestDocument.getLatestDoc();
-        WalleNotify notify = new WalleNotify();
-        for (Map map : messageMap){
-            String message=map.get("message").toString();
-            String loglevel=map.get("loglevel").toString();
-            Map host=(Map)map.get("host");
-            String hostname=host.get("name").toString();
-            Map<String,Object> fields=(Map)map.get("fields");
-            String topic=fields.get("log_topic").toString();
-
-            ErrorLogType errorLogType=identifyErrorType(message);
-            if (errorLogType!=null){        //判断是否新错误类型
-                boolean flag = docFilter.isFilter(errorLogType,message);       //错误日志过滤
-                if (flag){
-                    continue;
-                }else{
-                    errorLogTypeRepository.updateMessage(message,errorLogType.getId());     //更新lastupdate_time
-                    notify.sendMessage(topic,message);
-                }
-            }else{
-                String keywords="";
-                String space=" ";
-                List<String> wordList=splitString(message);
-                for(int i=0;i<wordList.size();i++){
-                    keywords=keywords+wordList.get(i)+space;
-                }
-                message=message.replace("\n","\\n");
-                errorLogTypeRepository.addNewErrorLogType("",topic,loglevel,"",keywords,message,hostname);
-                logger.info("添加新错误类型："+keywords);
-                notify.sendMessage(topic,message);
-            }
+        List<IndexConf> indexConfList = indexConfRepository.getAllIndexConf();
+        for (IndexConf indexConf:indexConfList){
+            List<Map> latestDoc = latestDocument.getLatestDoc(indexConf);
+            IndexMultiThread indexMultiThread = new IndexMultiThread(latestDoc,errorLogTypeRepository,docFilter,this);
+            indexMultiThread.start();
         }
+
     }
 
     /**
