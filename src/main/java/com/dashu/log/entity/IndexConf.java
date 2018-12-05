@@ -1,6 +1,7 @@
 package com.dashu.log.entity;
 
 import javax.persistence.*;
+import java.sql.Date;
 import java.util.Objects;
 
 /**
@@ -15,6 +16,13 @@ public class IndexConf {
     private String index;
     private String filed;
     private String keywords;
+    private Integer indexTotal;
+    private Integer scanInterval;
+    private String scanTime;
+
+    public void setScanTime(String scanTime) {
+        this.scanTime = scanTime;
+    }
 
     @Id
     @Column(name = "id")
@@ -72,4 +80,32 @@ public class IndexConf {
 
         return Objects.hash(id, index, filed, keywords);
     }
+
+    @Basic
+    @Column(name = "index_total")
+    public Integer getIndexTotal() {
+        return indexTotal;
+    }
+
+    public void setIndexTotal(Integer indexTotal) {
+        this.indexTotal = indexTotal;
+    }
+
+    @Basic
+    @Column(name = "scan_interval")
+    public Integer getScanInterval() {
+        return scanInterval;
+    }
+
+    public void setScanInterval(Integer scanInterval) {
+        this.scanInterval = scanInterval;
+    }
+
+    @Basic
+    @Column(name = "scan_time")
+    public String getScanTime() {
+        return scanTime;
+    }
+
+
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,13 +15,28 @@ import java.util.List;
  * @Date 2018/11/27 下午3:36
  **/
 public interface IndexConfRepository extends JpaRepository<IndexConf,Long> {
+
+    @Transactional
+    @Modifying
+    @Query(value = "update index_conf as t set t.scan_time = ?1 where t.index = ?2",nativeQuery = true)
+    void updateScanTime(String scantime,String index);
+
+    /**
+     * update index total num
+     * @param totleNum
+     * @param index
+     */
+    @Transactional
+    @Modifying
+    @Query(value = "update index_conf as t set t.index_total = ?1 where t.index = ?2",nativeQuery = true)
+    void updateIndexTotalNum(Integer totleNum,String index);
     /**
      * get all index conf
      * @return
      */
     @Transactional
     @Modifying
-    @Query(value = "select t.id,t.index,t.filed,t.keywords from index_conf as t",nativeQuery = true)
+    @Query(value = "select t.id,t.index,t.filed,t.keywords,t.index_total,t.scan_interval,t.scan_time from index_conf as t",nativeQuery = true)
     List<IndexConf> getAllIndexConf();
     /**
      * add index conf

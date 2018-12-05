@@ -1,7 +1,7 @@
 package com.dashu.log.monitor.action;
 
-import com.dashu.log.monitor.EsQuery;
 import com.dashu.log.monitor.dao.QueryHistoryRepository;
+import com.dashu.log.monitor.index.ESQuery;
 import com.dashu.log.util.ReadConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class Monitor {
         ReadConf readConf=new ReadConf();
         List<Map> confMap=readConf.readYml(ymlPath);
         List<Map> messageMap=new ArrayList<>();
-        EsQuery esQuery=new EsQuery();
+        ESQuery esQuery=new ESQuery();
 
         for (Map map: confMap){
             String index=map.get("index").toString();
@@ -50,7 +50,7 @@ public class Monitor {
                 queryHistoryRepository.insertQueryHistory(index,oldTimestamp);
             }
             //获取es记录最新时间
-            String latestTimestamp=esQuery.getLatestTime();
+            String latestTimestamp=esQuery.getLatestTime(index);
             //获取关键字查询结果
             List<Map> resultMap=esQuery.filterSearch(index,field,keyword,oldTimestamp);
             //更新时间

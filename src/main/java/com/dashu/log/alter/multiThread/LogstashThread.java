@@ -11,7 +11,7 @@ import com.dashu.log.alterRules.LogstashRule;
  **/
 public class LogstashThread extends Thread{
 
-    private static String HOSTNAME;
+    private String HOSTNAME;
 
     public LogstashThread(String hostname){
         this.HOSTNAME = hostname;

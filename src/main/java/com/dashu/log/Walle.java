@@ -46,7 +46,7 @@ public class Walle {
     /**
      * es index
      */
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     public void indexAlter(){
         indexAlter.alter();
     }
@@ -71,6 +71,7 @@ public class Walle {
         ESClusterAlter esClusterAlter = new ESClusterAlter();
         esClusterAlter.alter();
     }
+
 
 
 }

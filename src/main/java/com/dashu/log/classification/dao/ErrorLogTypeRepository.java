@@ -1,6 +1,6 @@
 package com.dashu.log.classification.dao;
 
-import com.dashu.log.entity.ErrorLogType;
+import com.dashu.log.entity.ErrorLogTypeBak;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,14 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @Author: xuyouchang
  * @Date 2018/8/29 上午11:06
  **/
-public interface ErrorLogTypeRepository extends JpaRepository<ErrorLogType,Long> {
+public interface ErrorLogTypeRepository extends JpaRepository<ErrorLogTypeBak,Long> {
 
 
 
 
     @Modifying
     @Transactional
-    @Query(value = "update ErrorLogType e set e.message=?1 where e.id=?2")
+    @Query(value = "update ErrorLogTypeBak e set e.message=?1 where e.id=?2")
     void updateMessage(String message,Integer id);
 
     @Modifying

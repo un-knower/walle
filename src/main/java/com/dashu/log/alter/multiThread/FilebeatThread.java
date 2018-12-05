@@ -8,7 +8,7 @@ import com.dashu.log.alter.FilebeatAlter;
  * @Date 2018/11/26 上午11:24
  **/
 public class FilebeatThread extends Thread {
-    private static String HOSTNAME;
+    private String HOSTNAME;
 
     public FilebeatThread(String hostname){
         this.HOSTNAME = hostname;

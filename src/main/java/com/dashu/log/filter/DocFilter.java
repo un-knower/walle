@@ -3,6 +3,7 @@ package com.dashu.log.filter;
 import com.dashu.log.alter.dao.AlterHistoryRepository;
 import com.dashu.log.classification.dao.ErrorLogTypeRepository;
 import com.dashu.log.classification.dao.FilterErrorTypeRepository;
+
 import com.dashu.log.entity.ErrorLogType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class DocFilter {
      * @param errorLog
      * @return
      */
-    public boolean isFilter(ErrorLogType errorLogType,String errorLog){
+    public boolean isFilter(ErrorLogType errorLogType, String errorLog){
         if (isForbid(errorLogType)||checkFrequency(errorLogType)||checkLength(errorLog)){
             return true;
         }else{
@@ -50,13 +51,13 @@ public class DocFilter {
      * @return
      */
     public boolean isForbid(ErrorLogType errorLogType){
-        List<Integer> forbidErrorType=filterErrorTypeRepository.findAllErrorTypeId();
-        for(int id : forbidErrorType){
-            if (id==errorLogType.getId()){
-                logger.info("error type "+id+" is forbid!");
-                return true;
-            }
-        }
+//        List<Integer> forbidErrorType=filterErrorTypeRepository.findAllErrorTypeId();
+//        for(int id : forbidErrorType){
+//            if (id==errorLogType.getId()){
+//                logger.info("error type "+id+" is forbid!");
+//                return true;
+//            }
+//        }
         return false;
     }
 
@@ -67,7 +68,7 @@ public class DocFilter {
      */
     public boolean checkFrequency(ErrorLogType errorLogType){
         Date curTime = new Date(System.currentTimeMillis());
-        Date lastUpdateTime= errorLogType.getLastUpdatetime();
+        Date lastUpdateTime= errorLogType.getLatestTime();
         long timeInterval=(curTime.getTime()-lastUpdateTime.getTime())/1000/60;
         if(timeInterval>TIME_THRESHOLD){
             return false;
