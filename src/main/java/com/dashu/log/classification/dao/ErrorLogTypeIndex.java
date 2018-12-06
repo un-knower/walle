@@ -4,34 +4,17 @@ import com.dashu.log.entity.ErrorLogType;
 import com.dashu.log.monitor.ESUtil;
 
 import com.dashu.log.util.HttpUtil;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.search.Scroll;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,9 +29,6 @@ public class ErrorLogTypeIndex {
     private ErrorLogTypeIndex errorLogTypeIndex;
     private static final String URL = "http://elastic:elastic@es1:9200/"+INDEX+"/_search?q="+FIELD;
 
-//    public static void main(String[] args) {
-//        updateSingleField("WBzgd2cBT8lHxfPTXVmq","IsForbid","1");
-//    }
 
     /**
      * 匹配相似日志

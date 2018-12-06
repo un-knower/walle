@@ -16,12 +16,12 @@ public class IndexConf {
     private String index;
     private String filed;
     private String keywords;
-    private Integer indexTotal;
+    private String indexTotal;
     private Integer scanInterval;
     private String scanTime;
 
-    public void setScanTime(String scanTime) {
-        this.scanTime = scanTime;
+    public void setIndexTotal(String indexTotal) {
+        this.indexTotal = indexTotal;
     }
 
     @Id
@@ -83,13 +83,10 @@ public class IndexConf {
 
     @Basic
     @Column(name = "index_total")
-    public Integer getIndexTotal() {
+    public String getIndexTotal() {
         return indexTotal;
     }
 
-    public void setIndexTotal(Integer indexTotal) {
-        this.indexTotal = indexTotal;
-    }
 
     @Basic
     @Column(name = "scan_interval")
@@ -105,6 +102,10 @@ public class IndexConf {
     @Column(name = "scan_time")
     public String getScanTime() {
         return scanTime;
+    }
+
+    public void setScanTime(String scanTime) {
+        this.scanTime = scanTime;
     }
 
 

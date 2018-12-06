@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ public interface IndexConfRepository extends JpaRepository<IndexConf,Long> {
     @Transactional
     @Modifying
     @Query(value = "update index_conf as t set t.index_total = ?1 where t.index = ?2",nativeQuery = true)
-    void updateIndexTotalNum(Integer totleNum,String index);
+    void updateIndexTotalNum(String totleNum,String index);
     /**
      * get all index conf
      * @return

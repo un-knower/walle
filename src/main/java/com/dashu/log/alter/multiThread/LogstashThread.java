@@ -1,8 +1,6 @@
 package com.dashu.log.alter.multiThread;
 
-import com.dashu.log.alter.FilebeatAlter;
 import com.dashu.log.alter.LogstashAlter;
-import com.dashu.log.alterRules.LogstashRule;
 
 /**
  * @Description

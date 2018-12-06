@@ -4,13 +4,11 @@ import com.dashu.log.alter.WalleNotify;
 import com.dashu.log.client.dao.IndexConfRepository;
 import com.dashu.log.entity.IndexConf;
 import com.dashu.log.util.HttpUtil;
-import org.apache.http.client.methods.HttpGet;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -41,33 +39,32 @@ public class IsStopIndexMultiThread extends Thread {
             JSONObject allObject = new JSONObject(resultObject.get("_all").toString());
             JSONObject totalObject = new JSONObject(allObject.get("total").toString());
             JSONObject indexingObject = new JSONObject(totalObject.get("indexing").toString());
-            Integer index_total = indexingObject.getInt("index_total");
+            long index_total = Long.valueOf(indexingObject.get("index_total").toString());
 
             Date curTime = new Date();
             long scan_time = Long.valueOf(this.INDEX_CONF.getScanTime()).longValue();
-            logger.info("curtime:"+curTime.getTime()+" scantime:"+scan_time);
             long timeInterval;
-            if (scan_time!=0){
+            if (scan_time!=0){      //判断是否首次扫描
                 timeInterval = (curTime.getTime()-scan_time)/1000/60;
-                System.out.println(timeInterval);
                 if (timeInterval>this.INDEX_CONF.getScanInterval()){                //判断距上次扫描时间间隔
                     indexConfRepository.updateScanTime(String.valueOf(curTime.getTime()),this.INDEX_NAME);
-                    int diff = index_total - this.INDEX_CONF.getIndexTotal();      //判断index中的文档数是否增加
+                    long diff = index_total - Integer.parseInt(this.INDEX_CONF.getIndexTotal());      //判断index中的文档数是否增加
                     if (diff <= 0){
                         WalleNotify notify = new WalleNotify();
-                        notify.sendMessage("stop indexing",this.INDEX_NAME+" is stop indexing");
+                        notify.sendMessage("stop indexing",this.INDEX_NAME+" is stop indexing"+" original num is:"+this.INDEX_CONF.getIndexTotal()+" now is:"+index_total);
                     }else {
-                        indexConfRepository.updateIndexTotalNum(index_total,this.INDEX_NAME);   //更新文档数
+                        indexConfRepository.updateIndexTotalNum(String.valueOf(index_total),this.INDEX_NAME);   //更新文档数
                     }
                 }
             }else {
                 indexConfRepository.updateScanTime(String.valueOf(curTime.getTime()),this.INDEX_NAME);
-                int diff = index_total - this.INDEX_CONF.getIndexTotal();      //判断index中的文档数是否增加
+                long diff = index_total - Integer.parseInt(this.INDEX_CONF.getIndexTotal());      //判断index中的文档数是否增加
+
                 if (diff <= 0){
                     WalleNotify notify = new WalleNotify();
-                    notify.sendMessage("stop indexing",this.INDEX_NAME+" is stop indexing");
+                    notify.sendMessage("stop indexing",this.INDEX_NAME+" is stop indexing"+" index_total is:"+index_total);
                 }else {
-                    indexConfRepository.updateIndexTotalNum(index_total,this.INDEX_NAME);   //更新文档数
+                    indexConfRepository.updateIndexTotalNum(String.valueOf(index_total),this.INDEX_NAME);   //更新文档数
                 }
             }
         } catch (IOException e) {

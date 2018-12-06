@@ -15,9 +15,9 @@ import java.io.IOException;
  **/
 public class FilebeatDetection {
     private static final Logger logger = LoggerFactory.getLogger(FilebeatDetection.class);
-    private static String HOSTNAME = null;
-    private static String STATS_URL = null;
-    private static String INFO_URL = null;
+    private String HOSTNAME = null;
+    private String STATS_URL = null;
+    private String INFO_URL = null;
 
     public FilebeatDetection(String hostname){
         this.HOSTNAME = hostname;
