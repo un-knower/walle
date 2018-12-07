@@ -6,6 +6,9 @@ import com.dashu.log.classification.dao.ErrorLogTypeIndex;
 import com.dashu.log.classification.dao.ErrorLogTypeRepository;
 import com.dashu.log.entity.ErrorLogType;
 import com.dashu.log.filter.DocFilter;
+import com.dashu.log.util.DateUtils;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -16,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.Float.NaN;
 
 /**
  * @Description 日志分析线程
@@ -47,69 +52,57 @@ public class IsErrorMultiThread extends Thread {
             String hostname=host.get("name").toString();
             Map<String,Object> fields=(Map)map.get("fields");
             String topic=fields.get("log_topic").toString();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
             ErrorLogTypeIndex errorLogTypeIndex = new ErrorLogTypeIndex();
-            JSONObject hitsObject = errorLogTypeIndex.getErrorLogType(message);
-            Integer maxScore;
-            if (hitsObject.get("max_score").toString() == "null"){
+            SearchHits hitsObject = errorLogTypeIndex.getErrorLogType(message);
+            if (hitsObject == null){
+                logger.error("hitsobject is null");
+                break;
+            }
+            float maxScore =hitsObject.getMaxScore();
+            if ( String.valueOf(maxScore) == "NaN"){
+                logger.error("maxScore is null"+" and message is "+message);
                  maxScore = -1;
             }else{
-                 maxScore = Integer.parseInt(hitsObject.get("max_score").toString());
+                logger.error("maxscore is "+maxScore);
+                 maxScore = hitsObject.getMaxScore();
             }
             if (maxScore <= this.SCORE_THRESHOLD){
-                logger.warn("maxSocre is "+maxScore);
-                message=message.replace("\n","\\n");
-                ErrorLogType errorLogType = new ErrorLogType(topic,message,loglevel,hostname,0,new Date(),new Date());
+//                message=message.replace("\n","\\n");
+                ErrorLogType errorLogType = new ErrorLogType(topic,message,loglevel,hostname,0,sdf.format(new Date()),sdf.format(new Date()));
                 errorLogTypeIndex.insertToIndex(errorLogType);
+                message = message.replace("\n","\\n");
                 notify.sendMessage(topic,message);
 
             }else {
-                logger.info("maxscore is "+maxScore);
-                JSONArray hitArray = new JSONArray(hitsObject.get("hits").toString());
-                JSONObject docObject = new JSONObject(hitArray.get(0).toString());
-                String docId = docObject.getString("_id");
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SearchHit hit = hitsObject.getHits()[0];
+                Map source = hit.getSourceAsMap();
+                String docId = hit.getId();
+                String Message = source.get("Message").toString();
+                String IndexName = source.get("IndexName").toString();
+                String MonitorField = source.get("MonitorField").toString();
+                String HostName = source.get("HostName").toString();
+                int IsForbid = Integer.parseInt(source.get("IsForbid").toString());
+                String createdTime = source.get("CreatedTime").toString();
+                String latestTime = source.get("LatestUpdateTime").toString();
                 try {
-                    Date createdTime = sdf.parse(docObject.getString("CreatedTime"));
-                    Date latestTime = sdf.parse(docObject.getString("LatestUpdateTime"));
-                    ErrorLogType errorLogType = new ErrorLogType(docObject.getString("_index"),docObject.getString("Message"),docObject.getString("MonitorField"),
-                            docObject.getString("HostName"),docObject.getInt("IsForbid"),createdTime,latestTime);
+                    ErrorLogType errorLogType = new ErrorLogType(IndexName,Message,MonitorField, HostName,IsForbid,createdTime,latestTime);
                     boolean flag = this.docFilter.isFilter(errorLogType,message);
                     if (flag){
                         continue;
                     }else {
                         Date date = new Date();
-                        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         errorLogTypeIndex.updateSingleField(docId,"LatestUpdateTime",sdf.format(date));
                         message = "docId:"+docId+"\\n"+message.replace("\n","\\n");
                         notify.sendMessage(topic,message);
                     }
-                } catch (ParseException e) {
+                } catch ( Exception e) {
                     e.printStackTrace();
                 }
 
             }
 
-//            ErrorLogTypeBak errorLogType=this.esIndexRule.identifyErrorType(message);
-//            if (errorLogType!=null){        //判断是否新错误类型
-//                boolean flag = this.docFilter.isFilter(errorLogType,message);       //错误日志过滤
-//                if (flag){
-//                    continue;
-//                }else{
-//                    this.errorLogTypeRepository.updateMessage(message,errorLogType.getId());     //更新lastupdate_time
-//                    notify.sendMessage(topic,message);
-//                }
-//            }else{
-//                String keywords="";
-//                String space=" ";
-//                List<String> wordList = this.esIndexRule.splitString(message);
-//                for(int i=0;i<wordList.size();i++){
-//                    keywords=keywords+wordList.get(i)+space;
-//                }
-//                message=message.replace("\n","\\n");
-//                this.errorLogTypeRepository.addNewErrorLogType("",topic,loglevel,"",keywords,message,hostname);
-//                notify.sendMessage(topic,message);
-//            }
         }
     }
 }

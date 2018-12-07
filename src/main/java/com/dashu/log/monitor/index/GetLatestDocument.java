@@ -36,17 +36,21 @@ public class GetLatestDocument {
         String index = indexConf.getIndex();
         String field = indexConf.getFiled();
         String keyword = indexConf.getKeywords();
+        if (field == null){
+            return null;
+        }else{
+            String timeCursor=queryHistoryRepository.findOldestTimestampByIndexName(index); // 获取上次查询时间游标
+            if (timeCursor==null||timeCursor==""){
+                timeCursor="2018-08-23T10:41:45.230Z";
+                queryHistoryRepository.insertQueryHistory(index,timeCursor);
+            }
+            String latestTimestamp=esQuery.getLatestTime(index);                //获取es记录最新时间
+            List<Map> latestDoc=esQuery.filterSearch(index,field,keyword,timeCursor);
+            queryHistoryRepository.updateOldTimestampByIndexName(latestTimestamp,index);                //更新时间游标
 
-        String timeCursor=queryHistoryRepository.findOldestTimestampByIndexName(index); // 获取上次查询时间游标
-        if (timeCursor==null||timeCursor==""){
-            timeCursor="2018-08-23T10:41:45.230Z";
-            queryHistoryRepository.insertQueryHistory(index,timeCursor);
+            return latestDoc;
         }
-        String latestTimestamp=esQuery.getLatestTime(index);                //获取es记录最新时间
-        List<Map> latestDoc=esQuery.filterSearch(index,field,keyword,timeCursor);
-        queryHistoryRepository.updateOldTimestampByIndexName(latestTimestamp,index);                //更新时间游标
 
-        return latestDoc;
 
 
     }

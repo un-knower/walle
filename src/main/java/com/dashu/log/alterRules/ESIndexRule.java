@@ -51,8 +51,13 @@ public class ESIndexRule {
         List<IndexConf> indexConfList = indexConfRepository.getAllIndexConf();
         for (IndexConf indexConf:indexConfList){
             List<Map> latestDoc = latestDocument.getLatestDoc(indexConf);
-            IsErrorMultiThread indexMultiThread = new IsErrorMultiThread(latestDoc,errorLogTypeRepository,docFilter,this,0);
-            indexMultiThread.start();
+            if (latestDoc == null){
+                continue;
+            }else {
+                IsErrorMultiThread indexMultiThread = new IsErrorMultiThread(latestDoc,errorLogTypeRepository,docFilter,this,0);
+                indexMultiThread.start();
+            }
+
         }
 
     }

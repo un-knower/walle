@@ -7,7 +7,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import java.io.BufferedReader;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 
 /**
  * @Description http相关请求封装
@@ -37,6 +37,7 @@ public class HttpUtil {
      * @return
      */
     public boolean post(String url,String message){
+
         HttpPost httpPost = new HttpPost(url);
         StringEntity entity = new StringEntity(message,"utf-8");
         httpPost.setEntity(entity);
@@ -59,6 +60,8 @@ public class HttpUtil {
      * @return 请求结果
      */
     public String get(String url) throws IOException {
+//        url = URLEncoder.encode(url, "UTF-8");
+//        logger.error(url);
         HttpGet httpGet = new HttpGet(url);
         HttpClient client = HttpClients.createDefault();
         HttpResponse response = null;

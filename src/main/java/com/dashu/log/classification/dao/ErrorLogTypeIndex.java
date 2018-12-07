@@ -4,11 +4,19 @@ import com.dashu.log.entity.ErrorLogType;
 import com.dashu.log.monitor.ESUtil;
 
 import com.dashu.log.util.HttpUtil;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +32,10 @@ import java.util.Map;
  **/
 public class ErrorLogTypeIndex {
     private static final Logger logger = LoggerFactory.getLogger(ErrorLogTypeIndex.class);
-    private static final String INDEX = "error_log_type";
-    private static final String FIELD = "Message:";
+    private final String INDEX = "error_log_type";
+    private final String FIELD = "Message:";
     private ErrorLogTypeIndex errorLogTypeIndex;
-    private static final String URL = "http://elastic:elastic@es1:9200/"+INDEX+"/_search?q="+FIELD;
+    private String URL = "http://elastic:elastic@es1:9200/"+INDEX+"/_search?q="+FIELD;
 
 
     /**
@@ -35,17 +43,20 @@ public class ErrorLogTypeIndex {
      * @param message
      * @return
      */
-    public JSONObject getErrorLogType(String message){
-        message = filterIllegalMassage(message);
-        HttpUtil httpUtil = new HttpUtil(this);
-        String url = this.URL+message;
-        logger.error(url);
+    public SearchHits getErrorLogType(String message){
+//        message = filterMassage(message);
+        ESUtil esUtil = new ESUtil();
+        RestHighLevelClient client = esUtil.connect();
+        SearchRequest request = new SearchRequest(this.INDEX);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("Message", message)
+                .fuzziness(Fuzziness.AUTO);
+        sourceBuilder.query(matchQueryBuilder);
+        request.source(sourceBuilder);
         try {
-            String result = httpUtil.get(url);
-            JSONObject jsonObject = new JSONObject(result);
-            System.out.println(jsonObject.toString());
-            JSONObject hitsObject = new JSONObject(jsonObject.get("hits").toString());
-            return  hitsObject;
+            SearchResponse response = client.search(request);
+            SearchHits hits = response.getHits();
+            return hits;
         } catch (IOException e) {
             logger.error(e.toString());
             return null;
@@ -107,11 +118,8 @@ public class ErrorLogTypeIndex {
      * @param message
      * @return
      */
-    public static String filterIllegalMassage(String message){
-        String[] illegalChar = {"+","-","&&","||","!","(",")","{","}","^","~","*","?",":","\\","\""," ","[","]"};
-        for (String s : illegalChar){
-            message = message.replace(s,",");
-        }
+    public static String filterMassage(String message){
+        message = message.split("\n")[0];
         return message;
 
     }

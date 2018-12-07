@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -68,13 +70,20 @@ public class DocFilter {
      */
     public boolean checkFrequency(ErrorLogType errorLogType){
         Date curTime = new Date(System.currentTimeMillis());
-        Date lastUpdateTime= errorLogType.getLatestTime();
-        long timeInterval=(curTime.getTime()-lastUpdateTime.getTime())/1000/60;
-        if(timeInterval>TIME_THRESHOLD){
+        String lastUpdateTime= errorLogType.getLatestTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        try {
+            long timeInterval=(curTime.getTime()-sdf.parse(lastUpdateTime).getTime())/1000/60;
+            if(timeInterval>TIME_THRESHOLD){
+                return false;
+            }else{
+                return true;
+            }
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
             return false;
-        }else{
-            return true;
         }
+
     }
 
 

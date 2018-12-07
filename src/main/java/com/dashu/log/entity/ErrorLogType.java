@@ -13,8 +13,8 @@ public class ErrorLogType {
     private String monitorField;
     private String hostname;
     private Integer isForbid;
-    private Date createdTime;
-    private Date latestTime;
+    private String createdTime;
+    private String latestTime;
 
     public String getIndexName() {
         return indexName;
@@ -36,11 +36,11 @@ public class ErrorLogType {
         return isForbid;
     }
 
-    public Date getCreatedTime() {
+    public String getCreatedTime() {
         return createdTime;
     }
 
-    public Date getLatestTime() {
+    public String getLatestTime() {
         return latestTime;
     }
 
@@ -64,18 +64,18 @@ public class ErrorLogType {
         this.isForbid = isForbid;
     }
 
-    public void setCreatedTime(Date createdTime) {
+    public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
     }
 
-    public void setLatestTime(Date latestTime) {
+    public void setLatestTime(String latestTime) {
         this.latestTime = latestTime;
     }
 
     public ErrorLogType() {
     }
 
-    public ErrorLogType(String indexName, String message, String monitorField, String hostname, Integer isForbid, Date createdTime, Date latestTime) {
+    public ErrorLogType(String indexName, String message, String monitorField, String hostname, Integer isForbid, String createdTime, String latestTime) {
         this.indexName = indexName;
         this.message = message;
         this.monitorField = monitorField;
