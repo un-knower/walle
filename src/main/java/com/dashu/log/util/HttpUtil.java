@@ -60,8 +60,6 @@ public class HttpUtil {
      * @return 请求结果
      */
     public String get(String url) throws IOException {
-//        url = URLEncoder.encode(url, "UTF-8");
-//        logger.error(url);
         HttpGet httpGet = new HttpGet(url);
         HttpClient client = HttpClients.createDefault();
         HttpResponse response = null;

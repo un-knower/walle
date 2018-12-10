@@ -57,15 +57,15 @@ public class IsErrorMultiThread extends Thread {
             ErrorLogTypeIndex errorLogTypeIndex = new ErrorLogTypeIndex();
             SearchHits hitsObject = errorLogTypeIndex.getErrorLogType(message);
             if (hitsObject == null){
-                logger.error("hitsobject is null");
+
                 break;
             }
             float maxScore =hitsObject.getMaxScore();
             if ( String.valueOf(maxScore) == "NaN"){
-                logger.error("maxScore is null"+" and message is "+message);
+
                  maxScore = -1;
             }else{
-                logger.error("maxscore is "+maxScore);
+
                  maxScore = hitsObject.getMaxScore();
             }
             if (maxScore <= this.SCORE_THRESHOLD){

@@ -48,7 +48,7 @@ public class IsStopIndexMultiThread extends Thread {
                 timeInterval = (curTime.getTime()-scan_time)/1000/60;
                 if (timeInterval>this.INDEX_CONF.getScanInterval()){                //判断距上次扫描时间间隔
                     indexConfRepository.updateScanTime(String.valueOf(curTime.getTime()),this.INDEX_NAME);
-                    long diff = index_total - Integer.parseInt(this.INDEX_CONF.getIndexTotal());      //判断index中的文档数是否增加
+                    long diff = index_total - Long.valueOf(this.INDEX_CONF.getIndexTotal());      //判断index中的文档数是否增加
                     if (diff <= 0){
                         WalleNotify notify = new WalleNotify();
                         notify.sendMessage("stop indexing",this.INDEX_NAME+" is stop indexing"+" original num is:"+this.INDEX_CONF.getIndexTotal()+" now is:"+index_total);

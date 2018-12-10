@@ -43,7 +43,7 @@ public class ESQuery {
      * @throws IOException
      */
     public String getLatestTime(String index)  {
-        ESUtil esUtil = new ESUtil();
+        ESUtil esUtil = ESUtil.getInstance();
         RestHighLevelClient client= esUtil.connect();
         SearchRequest searchRequest=new SearchRequest(index);
         SearchSourceBuilder searchSourceBuilder=new SearchSourceBuilder();
@@ -84,7 +84,7 @@ public class ESQuery {
             return null;
         }
 
-        ESUtil esUtil = new ESUtil();
+        ESUtil esUtil = ESUtil.getInstance();
         RestHighLevelClient client=esUtil.connect();
         final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
         SearchRequest searchRequest = new SearchRequest(index);

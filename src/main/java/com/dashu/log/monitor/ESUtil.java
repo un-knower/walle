@@ -17,6 +17,20 @@ import org.elasticsearch.client.RestHighLevelClient;
  * @Date 2018/12/4 上午10:35
  **/
 public class ESUtil {
+    private ESUtil(){}
+
+    private static ESUtil instance = null;
+    public static ESUtil getInstance(){
+        if (instance == null){
+            synchronized (ESUtil.class){
+                if (instance == null){
+                    instance = new ESUtil();
+
+                }
+            }
+        }
+        return instance;
+    }
 
     /**
      * 连接es集群

@@ -45,7 +45,7 @@ public class ErrorLogTypeIndex {
      */
     public SearchHits getErrorLogType(String message){
 //        message = filterMassage(message);
-        ESUtil esUtil = new ESUtil();
+        ESUtil esUtil = ESUtil.getInstance();
         RestHighLevelClient client = esUtil.connect();
         SearchRequest request = new SearchRequest(this.INDEX);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -72,7 +72,7 @@ public class ErrorLogTypeIndex {
         Map<String,Object> jsonMap = new HashMap<>();
         jsonMap.put(field,content);
         UpdateRequest request = new UpdateRequest("error_log_type","doc",docId).doc(jsonMap);
-        ESUtil esUtil = new ESUtil();
+        ESUtil esUtil = ESUtil.getInstance();
         RestHighLevelClient client = esUtil.connect();
         try {
             UpdateResponse response = client.update(request);
@@ -90,7 +90,7 @@ public class ErrorLogTypeIndex {
      * @return
      */
     public boolean insertToIndex(ErrorLogType errorLogType){
-        ESUtil esUtil = new ESUtil();
+        ESUtil esUtil = ESUtil.getInstance();
         RestHighLevelClient client = esUtil.connect();
 
         Map<String,Object> jsonMap = new HashMap<>();

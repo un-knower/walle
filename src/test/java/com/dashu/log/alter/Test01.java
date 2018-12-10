@@ -12,8 +12,6 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -24,7 +22,7 @@ import java.util.Map;
 public class Test01 {
     public static void main(String[] args) {
         String message = "2018-12-06 15:31:52,554 ERROR org.apache.hadoop.hive.ql.exec.Task: [Thread-28317]: Examining task ID: task_1541498229315_240388_r_000102 (and more";
-        ESUtil esUtil = new ESUtil();
+        ESUtil esUtil = ESUtil.getInstance();
         RestHighLevelClient client = esUtil.connect();
         SearchRequest request = new SearchRequest("error_log_type");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
